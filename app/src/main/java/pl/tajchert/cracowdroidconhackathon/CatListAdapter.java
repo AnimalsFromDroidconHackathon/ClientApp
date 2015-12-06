@@ -1,11 +1,16 @@
 package pl.tajchert.cracowdroidconhackathon;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -30,10 +35,14 @@ public class CatListAdapter extends RecyclerView.Adapter<CatListAdapter.ViewHold
         public TextView catName;
         @Bind(R.id.statusText)
         public TextView statusText;
+        @Bind(R.id.buttonFind)
+        public Button buttonFind;
+        public View view;
 
         public ViewHolder(View v) {
             super(v);
             context = v.getContext();
+            view = v;
             ButterKnife.bind(this, v);
         }
     }
@@ -50,8 +59,8 @@ public class CatListAdapter extends RecyclerView.Adapter<CatListAdapter.ViewHold
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        CatItem catItem = mDataset.get(position);
+    public void onBindViewHolder(final ViewHolder holder, int position) {
+        final CatItem catItem = mDataset.get(position);
         if(catItem != null) {
             if(catItem.pictureUrl != null && catItem.pictureUrl.length() > 0) {
                 Glide.with(holder.context).load(catItem.pictureUrl).into(holder.catProfile);
@@ -66,11 +75,82 @@ public class CatListAdapter extends RecyclerView.Adapter<CatListAdapter.ViewHold
                 holder.statusText.setText("NOT LOST");
                 holder.statusText.setTextColor(Color.GREEN);
             }
+            holder.view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showDialogCatOptions(mDataset.get(holder.getAdapterPosition()), holder.context);
+                }
+            });
+            holder.buttonFind.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    DroidconApplication.firebase.child("animals").child(catItem.id).child("lost").setValue(!catItem.lost);
+                }
+            });
         }
     }
 
     @Override
     public int getItemCount() {
         return mDataset.size();
+    }
+
+
+    public void showDialogCatOptions(final CatItem catItem, final Context context) {
+        AlertDialog.Builder builderSingle = new AlertDialog.Builder(context);
+        builderSingle.setTitle("Action:");
+
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
+                context,
+                android.R.layout.select_dialog_item);
+        arrayAdapter.add("Change cat name");
+        arrayAdapter.add("Change cat picture");
+
+        builderSingle.setNegativeButton(
+                "CLOSE",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+        builderSingle.setAdapter(
+                arrayAdapter,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String strName = arrayAdapter.getItem(which);
+                        if(which == 0) {
+                            changeCatName(catItem, context);
+                        } else if (which == 1) {
+                            changeCatName(catItem, context);
+                        }
+                    }
+                });
+        builderSingle.show();
+    }
+
+    private void changeCatName(final CatItem catItem, Context context) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Cat name");
+        final EditText input = new EditText(context);
+        builder.setView(input);
+
+        builder.setPositiveButton("SAVE", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                input.getText();
+                DroidconApplication.firebase.child("animals").child(catItem.id).child("name").setValue(input.getText().toString());
+            }
+        });
+        builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
     }
 }

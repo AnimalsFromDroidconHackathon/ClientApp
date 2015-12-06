@@ -60,21 +60,29 @@ public class ActivityMain extends AppCompatActivity {
             Log.d(TAG, "onActivityResult: ");
             if(data != null && data.hasExtra("code")) {
                 String code = data.getStringExtra("code");
-                if(code != null) {
+                if(code != null && code.length() > 0) {
                     Toast.makeText(ActivityMain.this, "CODE: " + code, Toast.LENGTH_LONG).show();
                     if(DroidconApplication.firebase != null) {
-                        code = code.toLowerCase().trim().replace(".","").replace("#", "").replace("$","").replace("[","").replace("]","");
-                        Firebase child = DroidconApplication.firebase.child("animals").child(code);
-                        CatItem catItem = new CatItem();
-                        catItem.lost = false;
-                        catItem.ownerId = DroidconApplication.telecomManager.getDeviceId();
-                        catItem.ownerName = "Tajchercik";
-                        catItem.name = "";
-                        catItem.type = "cat";
-                        child.setValue(catItem);
+                        if(code.contains("http://kote-web/")) {
+                            code = code.substring(code.lastIndexOf("-web/")+5, code.length());
+                            code = code.toLowerCase().trim().replace(".", "").replace("#", "").replace("$", "").replace("[", "").replace("]", "");
+                            setOwnerForCat(code);
+                        }
                     }
                 }
             }
         }
+    }
+
+    private void setOwnerForCat(String code) {
+        Firebase child = DroidconApplication.firebase.child("animals").child(code);
+        CatItem catItem = new CatItem();
+        catItem.id = code;
+        child.setValue(catItem);
+        DroidconApplication.firebase.child("animals").child(catItem.id).child("lost").setValue("false");
+        DroidconApplication.firebase.child("animals").child(catItem.id).child("ownerId").setValue(DroidconApplication.telecomManager.getDeviceId());
+        DroidconApplication.firebase.child("animals").child(catItem.id).child("ownerName").setValue("Tajchercik");
+        DroidconApplication.firebase.child("animals").child(catItem.id).child("type").setValue("cat");
+        DroidconApplication.firebase.child("animals").child(catItem.id).child("name").setValue("Cat");
     }
 }

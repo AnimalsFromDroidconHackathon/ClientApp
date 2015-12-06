@@ -55,38 +55,45 @@ public class FragmentCatList extends Fragment {
 
     private void getOwnCats() {
         if(DroidconApplication.firebase != null) {
-            DroidconApplication.firebase.addListenerForSingleValueEvent(new ValueEventListener() {
+            DroidconApplication.firebase.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     Log.d(TAG, "onDataChange: ");
-                    catItems.clear();
-                    String deviceId = DroidconApplication.telecomManager.getDeviceId();
-                    if (dataSnapshot != null && dataSnapshot.hasChild("animals")) {
-                        for (DataSnapshot data : dataSnapshot.child("animals").getChildren()) {
-                            String catOwner = null;
-                            if(data.hasChild("ownerId")) {
-                                catOwner = data.child("ownerId").getValue().toString();
-                            }
-                            if(catOwner != null && catOwner.equals(deviceId)) {
-                                final CatItem catItem = data.getValue(CatItem.class);
-                                getActivity().runOnUiThread(new Runnable() {
-                                    public void run() {
-                                        if (catItem != null) {
-                                            catItems.add(catItem);
-                                            if (mAdapter != null) {
-                                                mAdapter.notifyDataSetChanged();
-                                            }
-                                        }
-                                    }
-                                });
-                            }
-                        }
-                    }
+                    refreshCatList(dataSnapshot);
                 }
 
                 @Override
                 public void onCancelled(FirebaseError firebaseError) {
                     Log.d(TAG, "onCancelled: ");
+                }
+            });
+        }
+    }
+
+    private void refreshCatList(DataSnapshot dataSnapshot) {
+        catItems.clear();
+        String deviceId = DroidconApplication.telecomManager.getDeviceId();
+        if (dataSnapshot != null && dataSnapshot.hasChild("animals")) {
+            for (DataSnapshot data : dataSnapshot.child("animals").getChildren()) {
+                addCatToList(deviceId, data);
+            }
+        }
+    }
+
+    private void addCatToList(String deviceId, DataSnapshot data) {
+        String catOwner = null;
+        if(data.hasChild("ownerId")) {
+            catOwner = data.child("ownerId").getValue().toString();
+        }
+        if(catOwner != null && catOwner.equals(deviceId)) {
+            final CatItem catItem = data.getValue(CatItem.class);
+            catItem.id = data.getKey();
+            getActivity().runOnUiThread(new Runnable() {
+                public void run() {
+                    catItems.add(catItem);
+                    if (mAdapter != null) {
+                        mAdapter.notifyDataSetChanged();
+                    }
                 }
             });
         }
