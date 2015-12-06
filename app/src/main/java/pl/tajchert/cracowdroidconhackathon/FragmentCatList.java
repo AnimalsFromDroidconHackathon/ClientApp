@@ -38,6 +38,22 @@ public class FragmentCatList extends Fragment {
         View view = inflater.inflate(R.layout.fragment_activity_main, container, false);
         ButterKnife.bind(this, view);
         catItems = new ArrayList<>();
+        getOwnCats();
+        mRecyclerCatList.setHasFixedSize(true);
+        mLayoutManager = new LinearLayoutManager(getActivity());
+        mRecyclerCatList.setLayoutManager(mLayoutManager);
+        mAdapter = new CatListAdapter(catItems);
+        mRecyclerCatList.setAdapter(mAdapter);
+        return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getOwnCats();
+    }
+
+    private void getOwnCats() {
         if(DroidconApplication.firebase != null) {
             DroidconApplication.firebase.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -74,11 +90,5 @@ public class FragmentCatList extends Fragment {
                 }
             });
         }
-        mRecyclerCatList.setHasFixedSize(true);
-        mLayoutManager = new LinearLayoutManager(getActivity());
-        mRecyclerCatList.setLayoutManager(mLayoutManager);
-        mAdapter = new CatListAdapter(catItems);
-        mRecyclerCatList.setAdapter(mAdapter);
-        return view;
     }
 }

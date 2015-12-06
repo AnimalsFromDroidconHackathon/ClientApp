@@ -10,6 +10,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.firebase.client.Firebase;
+
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -60,6 +62,17 @@ public class ActivityMain extends AppCompatActivity {
                 String code = data.getStringExtra("code");
                 if(code != null) {
                     Toast.makeText(ActivityMain.this, "CODE: " + code, Toast.LENGTH_LONG).show();
+                    if(DroidconApplication.firebase != null) {
+                        code = code.toLowerCase().trim().replace(".","").replace("#", "").replace("$","").replace("[","").replace("]","");
+                        Firebase child = DroidconApplication.firebase.child("animals").child(code);
+                        CatItem catItem = new CatItem();
+                        catItem.lost = false;
+                        catItem.ownerId = DroidconApplication.telecomManager.getDeviceId();
+                        catItem.ownerName = "Tajchercik";
+                        catItem.name = "";
+                        catItem.type = "cat";
+                        child.setValue(catItem);
+                    }
                 }
             }
         }
