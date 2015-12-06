@@ -2,6 +2,8 @@ package pl.tajchert.cracowdroidconhackathon;
 
 import android.app.Application;
 
+import com.firebase.client.Firebase;
+
 import io.relayr.android.RelayrSdk;
 
 /**
@@ -10,9 +12,14 @@ import io.relayr.android.RelayrSdk;
 public class DroidconApplication extends Application {
 
     public static RelayrSdk relaySdk;
+    public static Firebase firebase;
+
     @Override
     public void onCreate() {
         super.onCreate();
+
+        Firebase.setAndroidContext(this);
+        firebase = new Firebase("https://kote.firebaseio.com/");
         //new RelayrSdk.Builder(this);
     }
 }
