@@ -2,8 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
-    tools:context=".FragmentCatList"
-    tools:showIn="@layout/activity_main">
+    tools:context=".FragmentCatList">
 
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
@@ -21,13 +20,20 @@
                 android:scaleType="centerCrop"
                 android:src="@drawable/kotel_icon" />
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/catName"
+                android:layout_below="@+id/kotelIcon"
+                android:layout_marginTop="16dp"
+                android:textAppearance="?android:attr/textAppearanceLarge"/>
+
             <LinearLayout
                 android:id="@+id/layoutStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/kotelIcon"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="16dp">
+                android:layout_below="@+id/catName"
+                android:layout_centerHorizontal="true">
 
                 <TextView
                     android:layout_width="wrap_content"

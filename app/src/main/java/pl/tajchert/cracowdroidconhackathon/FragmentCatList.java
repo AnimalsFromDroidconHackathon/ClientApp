@@ -38,34 +38,36 @@ public class FragmentCatList extends Fragment {
         View view = inflater.inflate(R.layout.fragment_activity_main, container, false);
         ButterKnife.bind(this, view);
         catItems = new ArrayList<>();
-        DroidconApplication.firebase.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.d(TAG, "onDataChange: ");
-                catItems.clear();
-                if(dataSnapshot != null && dataSnapshot.hasChild("animals")) {
-                    for(DataSnapshot data : dataSnapshot.child("animals").getChildren()) {
-                        //CatItem
-                        final CatItem catItem = data.getValue(CatItem.class);
-                        getActivity().runOnUiThread(new Runnable() {
-                            public void run() {
-                                if(catItem != null) {
-                                    catItems.add(catItem);
-                                    if(mAdapter != null) {
-                                        mAdapter.notifyDataSetChanged();
+        if(DroidconApplication.firebase != null) {
+            DroidconApplication.firebase.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Log.d(TAG, "onDataChange: ");
+                    catItems.clear();
+                    if (dataSnapshot != null && dataSnapshot.hasChild("animals")) {
+                        for (DataSnapshot data : dataSnapshot.child("animals").getChildren()) {
+                            //CatItem
+                            final CatItem catItem = data.getValue(CatItem.class);
+                            getActivity().runOnUiThread(new Runnable() {
+                                public void run() {
+                                    if (catItem != null) {
+                                        catItems.add(catItem);
+                                        if (mAdapter != null) {
+                                            mAdapter.notifyDataSetChanged();
+                                        }
                                     }
                                 }
-                            }
-                        });
+                            });
+                        }
                     }
                 }
-            }
 
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-                Log.d(TAG, "onCancelled: ");
-            }
-        });
+                @Override
+                public void onCancelled(FirebaseError firebaseError) {
+                    Log.d(TAG, "onCancelled: ");
+                }
+            });
+        }
         mRecyclerCatList.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerCatList.setLayoutManager(mLayoutManager);

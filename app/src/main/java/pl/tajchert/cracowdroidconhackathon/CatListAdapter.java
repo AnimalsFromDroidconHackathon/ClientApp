@@ -1,13 +1,18 @@
 package pl.tajchert.cracowdroidconhackathon;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
 
 /**
@@ -17,10 +22,16 @@ public class CatListAdapter extends RecyclerView.Adapter<CatListAdapter.ViewHold
     private ArrayList<CatItem> mDataset;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView mTextView;
+        public Context context;
+        @Bind(R.id.kotelIcon)
+        public ImageView catProfile;
+        @Bind(R.id.catName)
+        public TextView catName;
+
         public ViewHolder(View v) {
             super(v);
-            ButterKnife.bind(v);
+            context = v.getContext();
+            ButterKnife.bind(this, v);
         }
     }
 
@@ -38,6 +49,14 @@ public class CatListAdapter extends RecyclerView.Adapter<CatListAdapter.ViewHold
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         CatItem catItem = mDataset.get(position);
+        if(catItem != null) {
+            if(catItem.pictureUrl != null && catItem.pictureUrl.length() > 0) {
+                Glide.with(holder.context).load(catItem.pictureUrl).into(holder.catProfile);
+            }
+            if(catItem.name != null) {
+                holder.catName.setText(catItem.name);
+            }
+        }
     }
 
     @Override
