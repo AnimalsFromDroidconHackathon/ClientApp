@@ -114,14 +114,16 @@ public class FragmentCatList extends Fragment implements CatListAdapter.AdapterC
         if (catOwner != null && catOwner.equals(deviceId)) {
             final CatItem catItem = data.getValue(CatItem.class);
             catItem.id = data.getKey();
-            getActivity().runOnUiThread(new Runnable() {
-                public void run() {
-                    catItems.add(catItem);
-                    if (mAdapter != null) {
-                        mAdapter.notifyDataSetChanged();
+            if(getActivity() != null) {
+                getActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+                        catItems.add(catItem);
+                        if (mAdapter != null) {
+                            mAdapter.notifyDataSetChanged();
+                        }
                     }
-                }
-            });
+                });
+            }
         }
     }
 }

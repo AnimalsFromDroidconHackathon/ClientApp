@@ -2,6 +2,7 @@ package pl.tajchert.cracowdroidconhackathon;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -37,6 +38,8 @@ public class CatListAdapter extends RecyclerView.Adapter<CatListAdapter.ViewHold
         public TextView statusText;
         @Bind(R.id.buttonFind)
         public Button buttonFind;
+        @Bind(R.id.buttonMap)
+        public Button buttonMap;
         public View view;
 
         public ViewHolder(View v) {
@@ -100,6 +103,19 @@ public class CatListAdapter extends RecyclerView.Adapter<CatListAdapter.ViewHold
                     DroidconApplication.firebase.child("animals").child(catItem.id).child("lost").setValue(!catItem.lost);
                 }
             });
+            holder.buttonMap.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(holder.context, MapsActivity.class);
+                    intent.putExtra("id", catItem.id);
+                    holder.context.startActivity(intent);
+                }
+            });
+            if(catItem.lost) {
+                holder.buttonMap.setVisibility(View.VISIBLE);
+            } else {
+                holder.buttonMap.setVisibility(View.GONE);
+            }
         }
     }
 
