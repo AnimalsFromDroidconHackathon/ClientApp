@@ -47,8 +47,21 @@ public class CatListAdapter extends RecyclerView.Adapter<CatListAdapter.ViewHold
         }
     }
 
+    public interface AdapterCallback {
+        void onPhotoRequest(CatItem catItem);
+    }
+
+    private AdapterCallback adapterCallback;
+
+
+
+
     public CatListAdapter(ArrayList<CatItem> catItems) {
         mDataset = catItems;
+    }
+
+    public void setAdapterCallback(AdapterCallback adapterCallback) {
+        this.adapterCallback = adapterCallback;
     }
 
     @Override
@@ -124,7 +137,9 @@ public class CatListAdapter extends RecyclerView.Adapter<CatListAdapter.ViewHold
                         if(which == 0) {
                             changeCatName(catItem, context);
                         } else if (which == 1) {
-                            changeCatName(catItem, context);
+                            if(adapterCallback != null){
+                                adapterCallback.onPhotoRequest(catItem);
+                            }
                         }
                     }
                 });

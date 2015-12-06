@@ -1,5 +1,6 @@
 package pl.tajchert.cracowdroidconhackathon;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -21,16 +22,34 @@ import butterknife.ButterKnife;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class FragmentCatList extends Fragment {
+public class FragmentCatList extends Fragment implements CatListAdapter.AdapterCallback {
     private static final String TAG = FragmentCatList.class.getSimpleName();
 
     @Bind(R.id.recyclerCatList)
     RecyclerView mRecyclerCatList;
-    private RecyclerView.Adapter mAdapter;
+    private CatListAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private ArrayList<CatItem> catItems;
 
     public FragmentCatList() {
+    }
+
+    public interface ActivityContract {
+        void takePhoto(CatItem catItem);
+    }
+
+    private ActivityContract activityContract;
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        activityContract = (ActivityContract) activity;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        activityContract = null;
     }
 
     @Override
@@ -43,6 +62,8 @@ public class FragmentCatList extends Fragment {
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerCatList.setLayoutManager(mLayoutManager);
         mAdapter = new CatListAdapter(catItems);
+        mAdapter.setAdapterCallback(this);
+        mAdapter.notifyDataSetChanged();
         mRecyclerCatList.setAdapter(mAdapter);
         return view;
     }
@@ -53,8 +74,13 @@ public class FragmentCatList extends Fragment {
         getOwnCats();
     }
 
+    @Override
+    public void onPhotoRequest(CatItem catItem) {
+        activityContract.takePhoto(catItem);
+    }
+
     private void getOwnCats() {
-        if(DroidconApplication.firebase != null) {
+        if (DroidconApplication.firebase != null) {
             DroidconApplication.firebase.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -82,10 +108,10 @@ public class FragmentCatList extends Fragment {
 
     private void addCatToList(String deviceId, DataSnapshot data) {
         String catOwner = null;
-        if(data.hasChild("ownerId")) {
+        if (data.hasChild("ownerId")) {
             catOwner = data.child("ownerId").getValue().toString();
         }
-        if(catOwner != null && catOwner.equals(deviceId)) {
+        if (catOwner != null && catOwner.equals(deviceId)) {
             final CatItem catItem = data.getValue(CatItem.class);
             catItem.id = data.getKey();
             getActivity().runOnUiThread(new Runnable() {
