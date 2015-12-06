@@ -1,6 +1,8 @@
 package pl.tajchert.cracowdroidconhackathon;
 
 import android.app.Application;
+import android.content.Context;
+import android.telephony.TelephonyManager;
 
 import com.firebase.client.Firebase;
 
@@ -13,6 +15,7 @@ public class DroidconApplication extends Application {
 
     public static RelayrSdk relaySdk;
     public static Firebase firebase;
+    public static TelephonyManager telecomManager;
 
     @Override
     public void onCreate() {
@@ -20,6 +23,6 @@ public class DroidconApplication extends Application {
 
         Firebase.setAndroidContext(this);
         firebase = new Firebase("https://kote.firebaseio.com/");
-        //new RelayrSdk.Builder(this);
+        telecomManager =  (TelephonyManager) getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
     }
 }

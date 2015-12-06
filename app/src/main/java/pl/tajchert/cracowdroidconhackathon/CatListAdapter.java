@@ -1,6 +1,7 @@
 package pl.tajchert.cracowdroidconhackathon;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +28,8 @@ public class CatListAdapter extends RecyclerView.Adapter<CatListAdapter.ViewHold
         public ImageView catProfile;
         @Bind(R.id.catName)
         public TextView catName;
+        @Bind(R.id.statusText)
+        public TextView statusText;
 
         public ViewHolder(View v) {
             super(v);
@@ -55,6 +58,13 @@ public class CatListAdapter extends RecyclerView.Adapter<CatListAdapter.ViewHold
             }
             if(catItem.name != null) {
                 holder.catName.setText(catItem.name);
+            }
+            if(catItem.lost) {
+                holder.statusText.setText("LOST");
+                holder.statusText.setTextColor(Color.RED);
+            } else {
+                holder.statusText.setText("NOT LOST");
+                holder.statusText.setTextColor(Color.GREEN);
             }
         }
     }

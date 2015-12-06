@@ -44,20 +44,26 @@ public class FragmentCatList extends Fragment {
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     Log.d(TAG, "onDataChange: ");
                     catItems.clear();
+                    String deviceId = DroidconApplication.telecomManager.getDeviceId();
                     if (dataSnapshot != null && dataSnapshot.hasChild("animals")) {
                         for (DataSnapshot data : dataSnapshot.child("animals").getChildren()) {
-                            //CatItem
-                            final CatItem catItem = data.getValue(CatItem.class);
-                            getActivity().runOnUiThread(new Runnable() {
-                                public void run() {
-                                    if (catItem != null) {
-                                        catItems.add(catItem);
-                                        if (mAdapter != null) {
-                                            mAdapter.notifyDataSetChanged();
+                            String catOwner = null;
+                            if(data.hasChild("ownerId")) {
+                                catOwner = data.child("ownerId").getValue().toString();
+                            }
+                            if(catOwner != null && catOwner.equals(deviceId)) {
+                                final CatItem catItem = data.getValue(CatItem.class);
+                                getActivity().runOnUiThread(new Runnable() {
+                                    public void run() {
+                                        if (catItem != null) {
+                                            catItems.add(catItem);
+                                            if (mAdapter != null) {
+                                                mAdapter.notifyDataSetChanged();
+                                            }
                                         }
                                     }
-                                }
-                            });
+                                });
+                            }
                         }
                     }
                 }
